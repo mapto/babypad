@@ -1,0 +1,3 @@
+CHANNELS = 10
+
+FORMAT = "ogg"

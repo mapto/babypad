@@ -4,12 +4,31 @@ https://riptutorial.com/pygame/example/18046/event-loop
 """
 from os.path import isfile
 
+from random import randint
+
 import pygame as pg  # type: ignore
 from pygame.event import Event  # type: ignore
-
-from playsound import playsound  # type: ignore
+from pygame import mixer
 
 # from pygame import JOYBUTTONDOWN, KEYDOWN, MOUSEBUTTONDOWN, QUIT  # type: ignore
+
+from config import CHANNELS, FORMAT
+
+
+def playsound(sndFile: str):
+    ch = mixer.find_channel()
+    snd = mixer.Sound(file=sndFile)
+    ch.set_volume(mixer.music.get_volume())
+    ch.play(snd)
+
+
+def bound(v):
+    if v > 1:
+        return 1
+    elif v < 0:
+        return 0
+    else:
+        return v
 
 
 class Command:
@@ -32,7 +51,7 @@ class ButtonClickCommand(Command):
         super().exec(e)
         # pygame.quit()
         print(f"Button: {e.button}")
-        fname = f"sounds/{e.button}.mp3"
+        fname = f"sounds/{e.button}.{FORMAT}"
         if isfile(fname):
             playsound(fname)
         else:
@@ -43,15 +62,27 @@ class KeyClickCommand(Command):
     def exec(self, e: Event):
         super().exec(e)
         print(f"Key: {e.key}")
-        fname = f"{e.key}.mp3"
+        fname = f"{e.key}.{FORMAT}"
         if isfile(fname):
             playsound(fname)
         else:
             print(f"Not found: {fname}")
 
 
+class AdjustCommand(Command):
+    def exec(self, e: Event):
+        super().exec(e)
+        print(f"Axis: {e.axis}")
+        if e.axis == 1:
+            v = mixer.music.get_volume()
+            mixer.music.set_volume(bound(v - 0.1 * e.value))
+            print(f"Volume from {v} to {mixer.music.get_volume()}")
+        else:
+            print(f"Axis not used: {e.axis}")
+
+
 events_map = {
-    pg.JOYAXISMOTION: QuitCommand(),
+    pg.JOYAXISMOTION: AdjustCommand(),
     # pg.JOYHATMOTION: QuitCommand(),
     pg.JOYBUTTONDOWN: ButtonClickCommand(),
     pg.KEYDOWN: KeyClickCommand(),

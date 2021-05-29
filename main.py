@@ -4,12 +4,17 @@ from pygame.time import Clock  # type: ignore
 
 from events import events_map
 
+from config import CHANNELS
+
 
 def init() -> Clock:
     print(events_map)
 
     pg.init()
     pg.display.set_mode((800, 800), pg.RESIZABLE)
+
+    pg.mixer.init()
+    pg.mixer.set_num_channels(CHANNELS)
 
     # Init joystick. Currently only one.
     try:
