@@ -11,7 +11,7 @@ def init() -> Clock:
     print(events_map)
 
     pg.init()
-    pg.display.set_mode((800, 800), pg.RESIZABLE)
+    pg.display.set_mode((1024, 800), pg.RESIZABLE)
 
     pg.mixer.init()
     pg.mixer.set_num_channels(CHANNELS)

@@ -2,33 +2,17 @@
 https://www.pygame.org/docs/ref/event.html#pygame.event.Event
 https://riptutorial.com/pygame/example/18046/event-loop
 """
-from os.path import isfile
-
-from random import randint
-
 import pygame as pg  # type: ignore
 from pygame.event import Event  # type: ignore
 from pygame import mixer
 
+from pygame import K_ESCAPE
+
 # from pygame import JOYBUTTONDOWN, KEYDOWN, MOUSEBUTTONDOWN, QUIT  # type: ignore
 
-from config import CHANNELS, FORMAT
+from config import SOUND_COUNT
 
-
-def playsound(sndFile: str):
-    ch = mixer.find_channel()
-    snd = mixer.Sound(file=sndFile)
-    ch.set_volume(mixer.music.get_volume())
-    ch.play(snd)
-
-
-def bound(v):
-    if v > 1:
-        return 1
-    elif v < 0:
-        return 0
-    else:
-        return v
+from util import playsound, bound
 
 
 class Command:
@@ -51,22 +35,18 @@ class ButtonClickCommand(Command):
         super().exec(e)
         # pygame.quit()
         print(f"Button: {e.button}")
-        fname = f"sounds/{e.button}.{FORMAT}"
-        if isfile(fname):
-            playsound(fname)
-        else:
-            print(f"Not found: {fname}")
+        playsound(e.button)
 
 
 class KeyClickCommand(Command):
     def exec(self, e: Event):
         super().exec(e)
         print(f"Key: {e.key}")
-        fname = f"{e.key}.{FORMAT}"
-        if isfile(fname):
-            playsound(fname)
-        else:
-            print(f"Not found: {fname}")
+        if e.key == K_ESCAPE:
+            # pg.quit()
+            # exit(0)
+            QuitCommand().exec(e)
+        playsound(e.key % SOUND_COUNT)
 
 
 class AdjustCommand(Command):
